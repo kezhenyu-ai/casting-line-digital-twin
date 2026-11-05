@@ -2,6 +2,10 @@
 
 基于 Three.js / WebGL2 的铸造产线数字孪生与设备监控工作台。
 
+## 在线演示
+
+https://kezhenyu-ai.github.io/casting-line-digital-twin/
+
 项目包含厂房三维场景、铸造工艺链路、设备状态看板、排放监测、能源计量、模型导入工作台和引擎光影设置。
 
 ## 技术栈
