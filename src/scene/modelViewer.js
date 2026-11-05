@@ -422,7 +422,7 @@ export class ModelViewer extends FoundryViewer {
 
   async loadModel(url = '/models/hubei-foundry-pilot.glb') {
     const draco = new DRACOLoader();
-    draco.setDecoderPath('/draco/');
+    draco.setDecoderPath(`${import.meta.env.BASE_URL}draco/`);
     draco.setDecoderConfig({ type: 'js' });
     const loader = new GLTFLoader();
     loader.setDRACOLoader(draco);
