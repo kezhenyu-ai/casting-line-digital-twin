@@ -62,7 +62,7 @@ async function boot() {
     });
     if (modelMode) {
       setLoading(24, '正在加载厂房1造型线模型与设备绑定…');
-      await viewer.loadModel('/models/shape-line-20260617.glb');
+      await viewer.loadModel(`${import.meta.env.BASE_URL}models/shape-line-20260617.glb`);
       const brandProject = document.getElementById('brand-project-name');
       if (brandProject) brandProject.textContent = '铸造产线';
       renderSettings = createRenderSettings(viewer);

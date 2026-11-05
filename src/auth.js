@@ -109,9 +109,17 @@ export class LoginGate {
       } catch {
         // SessionStorage may be unavailable in privacy mode.
       }
-      this.setState('ready');
-      this.bootLine('MODE  static demo · browser-only ...... OK', 'ok');
-      this.setConsoleMode('STATIC DEMO');
+      // Public GitHub Pages demo: no backend auth is available, so enter as a
+      // read-only visitor instead of stopping on the login screen.
+      const guest = { username: 'guest', name: '演示访客', role: 'PUBLIC DEMO' };
+      this.currentUser = guest;
+      this.setUser(guest);
+      try { sessionStorage.setItem(STATIC_SESSION_KEY, JSON.stringify(guest)); } catch { /* noop */ }
+      this.bootLine('AUTH  public demo guest ............. PASS', 'ok');
+      this.setConsoleMode('PUBLIC DEMO');
+      this.setState('restored');
+      await sleep(300);
+      this.finish();
       return;
     }
 

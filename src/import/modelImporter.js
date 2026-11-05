@@ -74,7 +74,7 @@ async function parseModelFiles(files, onProgress = () => {}) {
   if (extOf(modelFile.name) === 'glb') {
     onProgress(42, '解析 GLB / 解压 Draco…');
     const draco = new DRACOLoader();
-    draco.setDecoderPath('/draco/');
+    draco.setDecoderPath(`${import.meta.env.BASE_URL}draco/`);
     draco.setDecoderConfig({ type: 'js' });
     const loader = new GLTFLoader();
     loader.setDRACOLoader(draco);
