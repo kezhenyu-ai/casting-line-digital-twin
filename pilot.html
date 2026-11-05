@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blender 模型接入试点 · DigitalTwin</title>
+  <script type="module" crossorigin src="/casting-line-digital-twin/assets/pilot-Cl2Em4-_.js"></script>
+  <link rel="modulepreload" crossorigin href="/casting-line-digital-twin/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/casting-line-digital-twin/assets/three-BOo4Gy3m.js">
+  <link rel="stylesheet" crossorigin href="/casting-line-digital-twin/assets/pilot-Bue2q84h.css">
+</head>
+<body>
+  <div id="pilot-app">
+    <canvas id="pilot-canvas"></canvas>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">DT</span>
+        <div>
+          <strong>铸造数字孪生 <em>/ BLENDER PILOT</em></strong>
+          <small>模型导入 · 项目切换 · 工艺映射 · 实时绑定</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <label class="project-select">
+          <span>项目</span>
+          <select id="project-select"></select>
+        </label>
+        <button id="open-library" class="btn btn-ghost">模型库</button>
+        <button id="import-model" class="btn btn-outline">导入 GLB</button>
+        <input id="model-file" type="file" accept=".glb,.gltf" hidden />
+        <button id="toggle-building" class="btn btn-ghost">显示厂房</button>
+        <button id="toggle-aux" class="btn btn-ghost">显示砂箱</button>
+        <button id="reset-view" class="btn btn-ghost">复位视角</button>
+      </div>
+    </header>
+
+    <aside class="left-rail">
+      <div class="rail-head">
+        <span class="eyebrow">PROCESS / 工艺流程</span>
+        <h2 id="project-name">铸造一厂 · 全厂</h2>
+        <p id="project-subtitle">熔炼 · 造型 · 浇注 · 砂处理</p>
+      </div>
+      <div id="stage-list" class="stage-list"></div>
+      <div class="rail-foot">
+        <div class="rail-stat"><span>设备组</span><b id="stat-groups">—</b></div>
+        <div class="rail-stat"><span>三角形</span><b id="stat-tris">—</b></div>
+        <div class="rail-stat"><span>加载</span><b id="stat-load">—</b></div>
+      </div>
+    </aside>
+
+    <aside class="right-panel">
+      <div class="panel-head">
+        <span class="eyebrow">ASSET / 设备详情</span>
+        <span id="device-status" class="status-pill">READY</span>
+      </div>
+      <div id="device-panel" class="device-panel">
+        <div class="empty-state">
+          <span class="empty-icon">⌁</span>
+          <h3>点击模型设备</h3>
+          <p>或从左侧工艺节点进入。设备参数与看板卡片通过 equipmentId 映射。</p>
+        </div>
+      </div>
+      <div class="mapping-note">
+        <span>MAPPING</span>
+        <code>GLB extras.equipmentId ↔ 看板 deviceId</code>
+      </div>
+    </aside>
+
+    <section class="bottom-bar">
+      <span id="load-state">场景就绪</span>
+      <span class="dot"></span>
+      <span id="fps">-- FPS</span>
+      <span id="drawcalls">-- calls</span>
+      <span id="tri-count">-- tris</span>
+      <span class="bottom-right">DRACO · GLB 2.0 · THREE.JS</span>
+    </section>
+
+    <div id="library-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card library-card">
+        <div class="modal-head">
+          <div><span class="eyebrow">MODEL LIBRARY / 模型库</span><h3>项目与模型</h3></div>
+          <button class="modal-close" data-close="library-modal">×</button>
+        </div>
+        <div id="library-list" class="library-list"></div>
+        <div class="modal-foot">
+          <button id="library-import" class="btn btn-outline">导入本地 GLB</button>
+          <span>本地导入保存在浏览器 IndexedDB，刷新后仍可打开。</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="mapping-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card mapping-card">
+        <div class="modal-head">
+          <div><span class="eyebrow">BINDING EDITOR / 映射配置</span><h3 id="map-title">编辑设备映射</h3></div>
+          <button class="modal-close" data-close="mapping-modal">×</button>
+        </div>
+        <form id="mapping-form" class="mapping-form">
+          <label>模型节点<input id="map-node" readonly /></label>
+          <div class="form-row">
+            <label>设备 ID<input id="map-device-id" placeholder="FUR-01" /></label>
+            <label>设备名称<input id="map-name" placeholder="1# 中频炉" /></label>
+          </div>
+          <div class="form-row">
+            <label>工艺阶段<select id="map-stage"></select></label>
+            <label>状态<select id="map-status"><option value="running">运行</option><option value="warning">预警</option><option value="offline">离线</option></select></label>
+          </div>
+          <label>测点 Tag<textarea id="map-tags" rows="4" placeholder="temperature=plant.fur01.temp&#10;power=plant.fur01.power"></textarea></label>
+          <label>备注<textarea id="map-note" rows="3" placeholder="设备说明 / 数据来源"></textarea></label>
+          <div class="modal-foot">
+            <button type="submit" class="btn btn-primary">保存映射</button>
+            <span>保存到当前项目；内置项目使用本地覆盖，导入模型写入模型库。</span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="loading" class="loading">
+      <div class="loading-inner">
+        <div class="loading-ring"></div>
+        <strong>正在加载模型</strong>
+        <span id="loading-text">读取 GLB / 解析设备组…</span>
+        <div class="loading-track"><i id="loading-bar"></i></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+  </div>
+</body>
+</html>
