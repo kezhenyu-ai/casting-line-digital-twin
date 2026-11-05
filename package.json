@@ -1,0 +1,18 @@
+{
+  "name": "casting-line-digital-twin",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "铸造产线数字孪生系统：Three.js 厂房三维监控、工艺链路、设备数字孪生与 GLB/FBX 模型导入工作台",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0"
+  }
+}
